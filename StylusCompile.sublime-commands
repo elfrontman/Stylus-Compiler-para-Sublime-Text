@@ -1,0 +1,10 @@
+[
+	{
+		"caption": "Stylus: Compile and Display"
+	,	"command": "stylus_compile"
+	}
+,	{
+		"caption": "Stylus: Compile and Save"
+	,	"command": "stylus_save"
+	}
+]

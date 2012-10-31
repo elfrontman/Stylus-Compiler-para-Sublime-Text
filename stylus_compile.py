@@ -60,10 +60,8 @@ class StylusCompileUtil():
 			f = open(save_path, "w")
 			f.write(text)
 			f.close()
-			sublime.status_message("Guardado en %s.%s" % (save_path, ext))
-		else:
-			self._write_output_to_panel(window, css, error)
-			
+			sublime.status_message("Guardado en %s" % (save_path))
+					
 		
 	def _get_text_to_compile(self):
 		region = self._get_selected_region() if self._editor_contains_selected_text() \

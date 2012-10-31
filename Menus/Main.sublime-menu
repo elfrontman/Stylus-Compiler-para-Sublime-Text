@@ -1,5 +1,30 @@
 [
     {
+        "caption": "Tools",
+        "mnemonic":"n",
+        "id":"tools",
+        "children":
+        [
+            {
+                "caption":"Stylus",
+                "mnemonic":"S",
+                "id":"stylus", 
+                "children":
+                [
+                    {
+                        "command":"stylus_compile",
+                        "caption":"Compile and Display"
+                    },
+                    {
+                        "command":"stylus_save",
+                        "caption":"Compile and Save"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
         "caption": "Preferences",
         "mnemonic": "n",
         "id": "preferences",
