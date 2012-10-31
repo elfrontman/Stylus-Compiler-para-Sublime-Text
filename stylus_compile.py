@@ -1,23 +1,17 @@
 import sublime, sublime_plugin, platform, subprocess
+from os import path
 
 PLATFORM_IS_WINDOWS = platform.system() is 'Windows'
 
+class StylusCompileUtil():
 
-class StylusCompileCommand(sublime_plugin.TextCommand):
-	
-	PANEL_NAME = "styluscompile_output"
-	DEFAULT_STYLUS_EXECUTABLE = 'stylus.cmd' if PLATFORM_IS_WINDOWS else 'stylus'
-	SETTINGS = sublime.load_settings("StylusCompile.sublime-settings")
+	def __init__(self, command):
+		self.command = command
+		self.PANEL_NAME = "styluscompile_output"
+		self.DEFAULT_STYLUS_EXECUTABLE = 'stylus.cmd' if PLATFORM_IS_WINDOWS else 'stylus'
+		self.SETTINGS = sublime.load_settings("StylusCompile.sublime-settings")
 
 
-	def run(self, edit):
-		text = self._get_text_to_compile()
-		window = self.view.window()
-
-		css, error = self._compile(text, window)
-		self._write_output_to_panel(window, css, error)
-
-			
 	def _compile(self, text, window):	
 		args = self._get_stylus_args()
 
@@ -55,19 +49,35 @@ class StylusCompileCommand(sublime_plugin.TextCommand):
 		panel.sel().clear()
 		panel.set_read_only(True)
 
+	def _save_output_to_file(self,window,css,error):
+		
+		text = css or str(error)
+		ext = "css";
+		
+		print(str(error))
+		if len(str(error)) == 0:
+			save_path = ("%s.%s") % (window.active_view().file_name().split('.')[:-1][0], ext)
+			f = open(save_path, "w")
+			f.write(text)
+			f.close()
+			sublime.status_message("Guardado en %s.%s" % (save_path, ext))
+		else:
+			self._write_output_to_panel(window, css, error)
+			
+		
 	def _get_text_to_compile(self):
 		region = self._get_selected_region() if self._editor_contains_selected_text() \
 			else self._get_region_for_entire_file()
-		return self.view.substr(region)
+		return self.command.view.substr(region)
 
 	def _get_region_for_entire_file(self):
-		return sublime.Region(0, self.view.size())
+		return sublime.Region(0, self.command.view.size())
 
 	def _get_selected_region(self):
-		return self.view.sel()[0]
+		return self.command.view.sel()[0]
 
 	def _editor_contains_selected_text(self):
-		for region in self.view.sel():
+		for region in self.command.view.sel():
 			if not region.empty():
 				return True
 		return False
@@ -88,3 +98,35 @@ class StylusCompileCommand(sublime_plugin.TextCommand):
 			return info
 		return None
 
+
+
+class StylusSaveCommand(sublime_plugin.TextCommand):
+
+	
+	def run(self, edit):
+		util = StylusCompileUtil(self)
+
+		text = text = util._get_text_to_compile()
+		window = self.view.window()
+
+		css, error = util._compile(text, window)
+		util._save_output_to_file(window, css, error)
+
+
+
+
+class StylusCompileCommand(sublime_plugin.TextCommand):
+	
+	def run(self, edit):
+		util = StylusCompileUtil(self)
+
+		text = util._get_text_to_compile()
+		window = self.view.window()
+
+		css, error = util._compile(text, window)
+		util._write_output_to_panel(window, css, error)
+
+			
+	
+
+	
